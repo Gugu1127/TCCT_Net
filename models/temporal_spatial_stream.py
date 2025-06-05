@@ -48,8 +48,10 @@ class TS_ConvModule(nn.Module):
             torch.Tensor: The output tensor with embeddings re-arranged into a sequence format.
         """
 
-        x = self.shallownet(x)
-        x = self.projection(x)
+        x = self.shallownet(x)  # 預期輸出形狀: [batch, 40, 48, 13]
+        # 對高度維度 (dim=2) 進行均值操作，將其壓縮為 1
+        x = torch.mean(x, dim=2, keepdim=True)  # 新形狀: [batch, 40, 1, 13]
+        x = self.projection(x)  # 重新排列後: [batch, 13, 40]
         return x
 
 

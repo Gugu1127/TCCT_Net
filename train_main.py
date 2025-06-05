@@ -32,7 +32,7 @@ torch.backends.cudnn.benchmark = False
     
 if __name__ == "__main__":
     # Load the configuration
-    config = load_config('/home/gugu/TCCT_Net/config/config.json')
+    config = load_config('/home/gugu/TCCT_Net/config_engagenet.json')
 
     # Train the model and get the true and predicted labels
     y_true, y_pred = train(

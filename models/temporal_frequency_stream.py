@@ -32,7 +32,8 @@ class TF_ConvModule(nn.Module):
 
         # shallownet-like architecture for initial feature extraction from time-frequency data
         self.shallownet = nn.Sequential(
-            nn.Conv2d(2, 16, (1, 10), padding=(0, 2)),
+            # 修改處：原本 in_channels 為 2，現改為 49 以匹配輸入 tensor 的 channel 數
+            nn.Conv2d(49, 16, (1, 10), padding=(0, 2)),
             nn.Conv2d(16, 32, (2, 1), padding=(0, 0)),
             nn.BatchNorm2d(32),
             nn.ELU(),
@@ -62,5 +63,4 @@ class TF_ConvModule(nn.Module):
         x = self.global_avg_pool(x) 
         x = torch.flatten(x, 1) 
         x = self.reduce_dim(x)  
-        
         return x

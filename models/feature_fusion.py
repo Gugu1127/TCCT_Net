@@ -25,7 +25,7 @@ class Decision_Fusion(nn.Module):
         TF_weight (nn.Parameter): Learnable weight for the Temporal-Frequency stream classifier output.
     """
     
-    def __init__(self, n_classes):
+    def __init__(self, n_classes, ts_in_dim=520):
         super(Decision_Fusion, self).__init__()
 
         # Model components for each modality
@@ -34,7 +34,8 @@ class Decision_Fusion(nn.Module):
 
         # Classification heads for each modality
         self.classification_head_TS = nn.Sequential(
-            nn.Linear(520, 128),  
+            nn.Linear(ts_in_dim, 128),  
+            # nn.Linear(1240, 128),  # ← 同步改為 1240
             nn.ELU(),
             nn.Dropout(0.3),
             nn.Linear(128, n_classes)

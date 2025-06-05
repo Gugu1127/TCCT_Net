@@ -1,0 +1,30 @@
+# 忽略 Python 編譯後檔案
+__pycache__/
+*.py[cod]
+*.so
+
+# 忽略虛擬環境
+TCCT/
+
+# 忽略 Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# 忽略 CSV 檔案
+*.csv
+
+# 忽略 pth 檔案（常用於 site-packages 自訂模組路徑）
+*.pth
+
+# 忽略 log 檔案
+*.log
+
+# 忽略 OS 產生的檔案
+.DS_Store
+Thumbs.db
+
+# 忽略 IDE/編輯器相關檔案
+.vscode/
+.idea/
+*.swp
+*.sublime-project
+*.sublime-workspace
