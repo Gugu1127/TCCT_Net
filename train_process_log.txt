@@ -1450,3 +1450,10 @@ Results saved to test_results.csv
 2025-06-03 04:01:57,643 [INFO] 已訂閱 Redis 訓練頻道：tcct_train
 2025-06-04 13:54:58,500 [INFO] 已訂閱 Redis 訓練頻道：tcct_train
 2025-06-04 13:58:46,072 [INFO] 已訂閱 Redis 訓練頻道：tcct_train
+2025-06-05 12:48:28,695 [INFO] 已訂閱 Redis 訓練頻道：tcct_train
+2025-06-14 10:00:40,185 [INFO] 已訂閱 Redis 訓練頻道：tcct_train
+2025-06-14 10:00:56,117 [INFO] 已訂閱 Redis 訓練頻道：tcct_train
+2025-06-23 09:57:15,086 [INFO] 已訂閱 Redis 訓練頻道：tcct_train
+2025-06-23 09:57:25,279 [INFO] 已訂閱 Redis 訓練頻道：tcct_train
+2025-06-25 16:15:46,984 [INFO] 已訂閱 Redis 訓練頻道：tcct_train
+2025-06-25 16:16:15,790 [INFO] 已訂閱 Redis 訓練頻道：tcct_train

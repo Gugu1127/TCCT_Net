@@ -6,22 +6,39 @@ from tqdm import tqdm
 
 def load_csv_data(folder_path, label_file, behavioral_features):
     """
-    Load data from CSV files in a folder and corresponding labels.
-
-    Args:
-        folder_path (str): Path to the folder containing the CSV files.
-        label_file (str): Path to the CSV file containing the labels.
-        behavioral_features (list of str): List of behavioral features to extract from the data.
-
-    Returns:
-        np.array: Array of data extracted from the CSV files.
-        np.array: Array of labels corresponding to the data.
+    支援訓練/推理兩種模式：label_file 可為 None。
     """
-        
+    all_data, all_labels = [], []
+
+    # ---------- 推論模式：無 label_file ----------
+    if label_file is None:
+        for filename in tqdm(os.listdir(folder_path), desc="Loading data"):
+            if filename.endswith('.csv'):
+                subject_file = os.path.join(folder_path, filename)
+                if os.path.getsize(subject_file) == 0:
+                    print(f"[警告] 檔案為空檔，已跳過: {subject_file}")
+                    continue
+                try:
+                    subject_data = pd.read_csv(subject_file)
+                except pd.errors.EmptyDataError:
+                    print(f"[警告] 檔案無法解析為有效 CSV，已跳過: {subject_file}")
+                    continue
+                missing_cols = [col for col in behavioral_features if col not in subject_data.columns]
+                if missing_cols:
+                    print(f"[警告] 檔案 {subject_file} 缺少特徵欄位: {missing_cols}，已跳過。")
+                    continue
+                subject_data_values = np.stack([subject_data[col].values for col in behavioral_features], axis=0)
+                all_data.append(subject_data_values)
+        if len(all_data) == 0:
+            raise ValueError(f"[嚴重警告] 推論模式下未成功讀取任何有效資料，請檢查資料來源！")
+        all_data = np.array(all_data)
+        all_data = np.expand_dims(all_data, axis=1)
+        return all_data, None
+
+    # ---------- 訓練/驗證模式：需 label ----------
     if os.path.getsize(label_file) == 0:
         raise ValueError(f"標籤檔 {label_file} 為空，請檢查資料前處理流程！")
     labels_df = pd.read_csv(label_file)
-    all_data, all_labels = [], []
 
     for filename in tqdm(os.listdir(folder_path), desc="Loading data"):
         if filename.endswith('.csv'):
@@ -36,15 +53,9 @@ def load_csv_data(folder_path, label_file, behavioral_features):
                 print(f"[警告] 檔案無法解析為有效 CSV，已跳過: {subject_file}")
                 continue
 
-            # 欄位一致性檢查
             missing_cols = [col for col in behavioral_features if col not in subject_data.columns]
             if missing_cols:
                 print(f"[警告] 檔案 {subject_file} 缺少特徵欄位: {missing_cols}，已跳過。")
-                continue
-
-            # 空段資料檢查
-            if any(len(subject_data[col].values) == 0 for col in behavioral_features):
-                print(f"[警告] 檔案 {subject_file} 中部分特徵為空，已跳過。")
                 continue
 
             subject_data_values = np.stack([subject_data[col].values for col in behavioral_features], axis=0)
@@ -112,35 +123,44 @@ def get_source_data(train_folder_path, test_folder_path, label_file, behavioral_
         train_data = (train_data - target_mean) / target_std
         return train_data, train_labels
 
-    
-
-
-def get_source_data_inference(inference_folder_path, label_file_inference,
-                              behavioral_features, target_mean, target_std):
+def get_source_data_inference(inference_folder_path, behavioral_features, target_mean, target_std):
     """
-    Load and preprocess inference data from the specified folder.
-
-    Args:
-        inference_folder_path (str): Path to the folder containing the inference data.
-        label_file_inference (str): Path to the CSV file containing the labels.
-        behavioral_features (list of str): List of behavioral features to extract from the data.
-        target_mean (float): Mean value of the training data used for standardization.
-        target_std (float): Standard deviation of the training data used for standardization.
-
-    Returns:
-        np.array: Processed testing data.
-        np.array: Labels for the testing data.
+    只回傳預處理後的推理資料，不需要 label。
     """
-
-    # Load inference data
     print('\nLoading data for inference ...')
-    inference_data, inference_labels = load_csv_data(inference_folder_path, label_file_inference, behavioral_features)
-    inference_labels = inference_labels.reshape(-1)
-
-    # Standardize inference data using provided training data statistics
+    # 修改 load_csv_data，讓 label_file_inference 可以設為 None
+    inference_data, _ = load_csv_data(inference_folder_path, None, behavioral_features)
+    # 標準化
     inference_data = (inference_data - target_mean) / target_std
+    return inference_data    
 
-    return inference_data, inference_labels
+
+# def get_source_data_inference(inference_folder_path, label_file_inference,
+#                               behavioral_features, target_mean, target_std):
+#     """
+#     Load and preprocess inference data from the specified folder.
+
+#     Args:
+#         inference_folder_path (str): Path to the folder containing the inference data.
+#         label_file_inference (str): Path to the CSV file containing the labels.
+#         behavioral_features (list of str): List of behavioral features to extract from the data.
+#         target_mean (float): Mean value of the training data used for standardization.
+#         target_std (float): Standard deviation of the training data used for standardization.
+
+#     Returns:
+#         np.array: Processed testing data.
+#         np.array: Labels for the testing data.
+#     """
+
+#     # Load inference data
+#     print('\nLoading data for inference ...')
+#     inference_data, inference_labels = load_csv_data(inference_folder_path, label_file_inference, behavioral_features)
+#     inference_labels = inference_labels.reshape(-1)
+
+#     # Standardize inference data using provided training data statistics
+#     inference_data = (inference_data - target_mean) / target_std
+
+#     return inference_data, inference_labels
 
 
 # import os
